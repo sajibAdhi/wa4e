@@ -16,9 +16,9 @@ if ( isset($_POST['logout']) ) {
 $names = array('Rock', 'Paper', 'Scissors');
 $human = isset($_POST["human"]) ? $_POST['human']+0 : -1;
 
-$computer = 0; // Hard code the computer to rock
+// $computer = 0; // Hard code the computer to rock
 // TODO: Make the computer be random
-// $computer = rand(0,2);
+$computer = rand(0,2);
 
 // This function takes as its input the computer and human play
 // and returns "Tie", "You Lose", "You Win" depending on play
@@ -26,11 +26,19 @@ $computer = 0; // Hard code the computer to rock
 function check($computer, $human) {
     // For now this is a rock-savant checking function
     // TODO: Fix this
-    if ( $human == 0 ) {
+    if ( $human == $computer ) {
         return "Tie";
-    } else if ( $human == 1 ) {
+    } elseif ( $computer == 0 && $human == 1 ) {
         return "You Win";
-    } else if ( $human == 2 ) {
+    } elseif ( $computer == 0 && $human == 2 ) {
+        return "You Lose";
+    } elseif ( $computer == 1 && $human == 2) {
+        return "You Win";
+    } elseif ( $computer == 1 && $human == 0 ) {
+        return "You Lose";
+    } elseif ( $computer == 2 && $human == 0 ) {
+        return "You Win";
+    } elseif ( $computer == 2 && $human == 1 ) {
         return "You Lose";
     }
     return false;
@@ -43,8 +51,8 @@ $result = check($computer, $human);
 <!DOCTYPE html>
 <html>
 <head>
-<title>Dr. Chuck's Rock, Paper, Scissors Game</title>
-<?php require_once "bootstrap.php"; ?>
+<title>Sajib Adhikary's Rock, Paper, Scissors Game</title>
+<?php require_once "bootstrap.php"; ?>s
 </head>
 <body>
 <div class="container">
@@ -72,7 +80,7 @@ if ( isset($_REQUEST['name']) ) {
 <?php
 if ( $human == -1 ) {
     print "Please select a strategy and press Play.\n";
-} else if ( $human == 3 ) {
+} elseif ( $human == 3 ) {
     for($c=0;$c<3;$c++) {
         for($h=0;$h<3;$h++) {
             $r = check($c, $h);

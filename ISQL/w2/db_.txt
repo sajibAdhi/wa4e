@@ -1,0 +1,44 @@
+;create database.
+;CREATE DATABASE database_name
+
+CREATE DATABASE wa4e
+
+
+;Crete Table in a database
+;CREATE TABLE table_name ( column1_name DATA_TYPE, column2_name DATA_TYPE)
+
+CREATE TABLE itsql(
+	id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255),
+    age INTEGER,
+    PRIMARY KEY(id)
+)
+
+
+;Inser Data into a DataTable
+;INSERT INTO itsql (column1_name, column2_name) VALUES (value, value);
+
+INSERT INTO itsql (name, age) VALUES ('Zahra', 34);
+INSERT INTO itsql (name, age) VALUES ('Olufunke', 23);
+INSERT INTO itsql (name, age) VALUES ('Choire', 38);
+INSERT INTO itsql (name, age) VALUES ('Makenna', 32);
+INSERT INTO itsql (name, age) VALUES ('Ula', 16);
+INSERT INTO itsql (name, age) VALUES ('Garren', 40);
+
+
+;drop database.
+;DROP DATABASE database_name
+
+DROP DATABASE wa4e
+
+
+;Drop Table in a database
+;DROP TABLE table_name
+
+DROP TABLE itsql
+
+
+;Delect Data form database
+;DELETE FROM database_name
+
+DELETE FROM itsql

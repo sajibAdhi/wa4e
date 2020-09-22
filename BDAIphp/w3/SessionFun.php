@@ -26,7 +26,7 @@ if (!isset($_SESSION['count'])) {
 
 <body>
     <h1>Message : <?= $msg ?></h1>
-    <p>Our Session ID : <?= $_SESSION['count'] ?></p>
+    <p>Our Session ID : <?= session_id() ?></p>
     <p>
         <a href="SessionFun.php">Restart Session</a>
     </p>

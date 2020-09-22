@@ -9,7 +9,7 @@ if (isset($_POST['guess'])) {
   $guess = $_POST['guess'] + 0;
   $_SESSION['guess'] = $guess;
 
-  $randomValue = rand(0,20);
+  $randomValue = 42;
   if ($guess == $randomValue) {
     $message = $_SESSION['message'] = "Great job, your guess is right.";
   } elseif ($guess < $randomValue) {

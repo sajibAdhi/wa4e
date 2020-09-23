@@ -8,24 +8,46 @@ function test_input($data)
     $data = htmlspecialchars($data);
     return $data;
 }
-        
+
 if (isset($_POST['account_no']) && isset($_POST['password'])) {
-    $ac= test_input($_POST['account_no']);
-    $pw = test_input($_POST['password']);
     // Logout Current User
     unset($_SESSION['account']);
 
-    // Check Password
-    if ($pw == "password") {
-        $_SESSION['account'] = $ac;
-        $_SESSION['success'] = "LOG In Succcess";
-        header("Location: app.php");
-        return;
+    $ac = test_input($_POST['account_no']);
+    $pw = test_input($_POST['password']);
+
+    // Email Pattern
+    $emailPattern = "/\b[\w\.-]+@/";
+
+    // Check if Input Fields empty show a message
+    if (!empty($ac) && !empty($pw)) {
+
+        if (preg_match($emailPattern, $ac) == 1) {
+
+            $password = hash('sha256', 'php123');
+            $passHash = hash('sha256', $pw);
+
+            if ($passHash == $password) {
+
+                $_SESSION['account'] = $ac;
+                $_SESSION['success'] = "LOG In Succcess";
+                header("Location: view.php");
+                return;
+            } else {
+
+                $_SESSION['error'] = "Incorrect password";
+            }
+        } else {
+
+            $_SESSION['error'] = "Email must have an at-sign (@)";
+        }
     } else {
-        $_SESSION['error'] = "Log In Failed";
-        header("Location: login.php");
-        return;
+
+        $_SESSION['error'] = "Email and Password are Required";
     }
+
+    header("Location: login.php");
+    return;
 }
 
 if (isset($_SESSION['error'])) {
@@ -34,46 +56,6 @@ if (isset($_SESSION['error'])) {
         </div>';
     unset($_SESSION['error']);
 }
-
-if (isset($_SESSION['success'])) {
-    $msg = '<div class="alert alert-success" role="alert">
-            <strong>' . $_SESSION['success'] . '</strong>
-        </div>';
-    unset($_SESSION['success']);
-}
-?>
-<?php
-        $alert="";
-        if (isset($_POST['who']) && isset($_POST['pass'])) {
-            $who = $_POST['who'];
-            $pass = $_POST['pass'];
-            $who = test_input($who);
-            $pass = test_input($pass);
-            
-            $patternOfEmail = "/\b[\w\.-]+@/";
-
-            if (empty($who) || empty($pass)) {
-                $alert = "Email and Password are Required";
-            } else {
-                if (preg_match($patternOfEmail, $who) == 1) {
-                    $password = hash('sha256', 'php123');
-                    $passHash = hash('sha256', $pass);
-
-                    if ($passHash == $password) {
-                        error_log("Login success ".$_POST['who']);
-                        header("Location: autos.php?name=".urlencode($who));
-                    } else {
-                        $alert = "Incorrect password";
-                        error_log("Login fail ".$_POST['who']." $passHash");
-                    }
-                } else {
-                    $alert = "Email must have an at-sign (@)";
-                }
-            }
-        }
-
-        
-
 ?>
 <!doctype html>
 <html lang="en">

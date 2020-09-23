@@ -61,7 +61,7 @@ if (isset($_SESSION['error'])) {
 <html lang="en">
 
 <head>
-    <title>LogIn</title>
+    <title>Sajib Adhikary - LogIn</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -90,7 +90,7 @@ if (isset($_SESSION['error'])) {
             </div>
             <div class="form-group row">
                 <button type="submit" class="btn btn-primary">Login</button>
-                <a class="btn btn-warning" href="app.php" role="button">Cancel</a>
+                <a class="btn btn-warning" href="index.php" role="button">Cancel</a>
             </div>
         </form>
     </div>

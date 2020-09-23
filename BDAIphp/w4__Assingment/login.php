@@ -9,11 +9,11 @@ function test_input($data)
     return $data;
 }
 
-if (isset($_POST['account_no']) && isset($_POST['password'])) {
+if (isset($_POST['email']) && isset($_POST['password'])) {
     // Logout Current User
-    unset($_SESSION['account']);
+    unset($_SESSION['name']);
 
-    $ac = test_input($_POST['account_no']);
+    $ac = test_input($_POST['email']);
     $pw = test_input($_POST['password']);
 
     // Email Pattern
@@ -29,7 +29,7 @@ if (isset($_POST['account_no']) && isset($_POST['password'])) {
 
             if ($passHash == $password) {
 
-                $_SESSION['account'] = $ac;
+                $_SESSION['name'] = $ac;
                 $_SESSION['success'] = "LOG In Succcess";
                 header("Location: view.php");
                 return;
@@ -77,9 +77,9 @@ if (isset($_SESSION['error'])) {
         <span><?= empty($msg) ? '' : $msg ?></span>
         <form method="POST">
             <div class="form-group row">
-                <label for="accountNo" class="col-md-3 col-form-label">Account No:</label>
+                <label for="email" class="col-md-3 col-form-label">Email:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="account_no" id="accountNo" placeholder="">
+                    <input type="text" class="form-control" name="email" id="email" placeholder="">
                 </div>
             </div>
             <div class="form-group row">

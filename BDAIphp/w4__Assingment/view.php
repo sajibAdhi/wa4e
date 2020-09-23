@@ -7,7 +7,7 @@ if (isset($_SESSION['success'])) {
         </div>';
     unset($_SESSION['success']);
 
-    $name = $_SESSION['account'];
+    $name = $_SESSION['name'];
 }
 ?>
 <!doctype html>
@@ -27,8 +27,9 @@ if (isset($_SESSION['success'])) {
     <div class="container">
         <?php
         // Check If Loged In. 
-        if (!isset($_SESSION['account'])) :
+        if (!isset($_SESSION['name'])) :
         ?>
+            <h1>Name Perameter Missing</h1>
             <p>
                 Please <a href="login.php">Log In</a> To Start.
             </p>

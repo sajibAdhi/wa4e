@@ -9,12 +9,12 @@ function test_input($data)
     return $data;
 }
 
-if (isset($_POST['email']) && isset($_POST['password'])) {
+if (isset($_POST['email']) && isset($_POST['pass'])) {
     // Logout Current User
     unset($_SESSION['name']);
 
     $ac = test_input($_POST['email']);
-    $pw = test_input($_POST['password']);
+    $pw = test_input($_POST['pass']);
 
     // Email Pattern
     $emailPattern = "/\b[\w\.-]+@/";
@@ -28,6 +28,8 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
             $passHash = hash('sha256', $pw);
 
             if ($passHash == $password) {
+
+                error_log("Login success ".$_POST['email']);
 
                 $_SESSION['name'] = $ac;
                 $_SESSION['success'] = "LOG In Succcess";
@@ -45,7 +47,7 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
 
         $_SESSION['error'] = "Email and Password are Required";
     }
-
+    error_log("Login fail ".$_POST['email']." $passHash");
     header("Location: login.php");
     return;
 }
@@ -85,11 +87,11 @@ if (isset($_SESSION['error'])) {
             <div class="form-group row">
                 <label for="password" class="col-md-3 col-form-label">Password:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="password" id="password" placeholder="">
+                    <input type="text" class="form-control" name="pass" id="password" placeholder="">
                 </div>
             </div>
             <div class="form-group row">
-                <button type="submit" class="btn btn-primary">Login</button>
+                <input type="submit" class="btn btn-primary" value="Log In">
                 <a class="btn btn-warning" href="index.php" role="button">Cancel</a>
             </div>
         </form>

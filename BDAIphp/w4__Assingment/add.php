@@ -75,7 +75,7 @@ if (isset($_SESSION['success'])) {
 <html>
 
 <head>
-    <title>Sajib Adhikary</title>
+    <title>Sajib Adhikary - Add Page</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 

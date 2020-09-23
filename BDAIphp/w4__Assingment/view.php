@@ -70,9 +70,7 @@ if (isset($_SESSION['success'])) {
                         while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) :
                         ?>
                             <tr>
-                                <td>
-                                    <b><?= $data['make'] ?></b>
-                                </td>
+                                <td><?= $data['make'] ?></td>
                                 <td><?= $data['year'] ?></td>
                                 <td><?= $data['mileage'] ?></td>
                             </tr>
@@ -82,10 +80,10 @@ if (isset($_SESSION['success'])) {
                 <!-- Autos Table End's Here -->
             <?php endif; ?>
             <p>
-                If you want to add data, Click <a class="btn btn-primary" href="add.php" role="button">Here</a>
+                If you want to add data, Click <a class="btn btn-primary" href="add.php" role="button">Add New</a>
             </p>
             <p>
-                Please <a href="logout.php">LogOut</a> When you are done.
+                Please <a href="logout.php">Logout</a> When you are done.
             </p>
         <?php endif; ?>
     </div>

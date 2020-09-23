@@ -2,7 +2,12 @@
 require_once 'pdo.php';
 session_start();
 
-// Test Post Data
+/**
+ * Sanitize Post Data
+ *
+ * @param string $data
+ * @return string
+ */
 function test_input($data)
 {
     $data = trim($data);
@@ -11,29 +16,42 @@ function test_input($data)
     return $data;
 }
 
+/**
+ * Destroy session and Logout
+ */
 if (isset($_POST['logout'])) {
     header("Location: view.php");
     return;
 }
 
+/**
+ * Recive's Post Request, Check Validation, Add data.
+ */
 if (isset($_POST['make']) && isset($_POST['year']) && isset($_POST['mileage'])) {
+
+    ///Sanitization
     $make = test_input($_POST['make']);
     $year = test_input($_POST['year']);
     $milage = test_input($_POST['mileage']);
-
+    
+    /// Check is numeric
     if (is_numeric($year) && is_numeric($milage)) {
 
+        /// if $make is empty then return error msg
         if (!empty($make)) {
 
+            /// Prepare Insert quere.
             $stmt = $pdo->prepare('INSERT INTO autos
                 (make, year, mileage) VALUES ( :mk, :yr, :mi)');
 
+            /// Execute query
             $insert = $stmt->execute(array(
                 ':mk' => $make,
                 ':yr' => $year,
                 ':mi' => $milage
             ));
 
+            /// If Insertion Fail @return error
             if ($insert != false) {
 
                 $_SESSION['success'] = "Record inserted";
@@ -55,7 +73,7 @@ if (isset($_POST['make']) && isset($_POST['year']) && isset($_POST['mileage'])) 
 }
 
 
-
+/// Check if any Error msg is set and then unset
 if (isset($_SESSION['error'])) {
     $msg = '<div class="alert alert-warning" role="alert">
             <strong>' . $_SESSION['error'] . '</strong>
@@ -63,6 +81,7 @@ if (isset($_SESSION['error'])) {
     unset($_SESSION['error']);
 }
 
+/// Check if any Success msg is set and then unset
 if (isset($_SESSION['success'])) {
     $msg = '<div class="alert alert-warning" role="alert">
             <strong>' . $_SESSION['success'] . '</strong>
@@ -81,7 +100,12 @@ if (isset($_SESSION['success'])) {
 
 <body>
     <div class="container">
-        <?php if (isset($_SESSION['name'])) : ?>
+
+        <?php
+        /**
+         * Check User Logged in Or Not.
+         */
+        if (isset($_SESSION['name'])) : ?>
                 <h1>Add Autos for <?= $_SESSION['name'] ?></h1>
                 <br>
                 <span><?= empty($msg)? '' : $msg ?></span>

@@ -1,6 +1,12 @@
 <?php
 session_start();
 
+/**
+ * Sanitize Post Data
+ *
+ * @param string $data
+ * @return string
+ */
 function test_input($data)
 {
     $data = trim($data);
@@ -9,24 +15,32 @@ function test_input($data)
     return $data;
 }
 
+/**
+ * Login Function
+ * 
+ */
 if (isset($_POST['email']) && isset($_POST['pass'])) {
-    // Logout Current User
+    
+    /// Logout Current User
     unset($_SESSION['name']);
 
+    /// Sanitization
     $ac = test_input($_POST['email']);
     $pw = test_input($_POST['pass']);
 
-    // Email Pattern
+    /// Email Pattern
     $emailPattern = "/\b[\w\.-]+@/";
 
-    // Check if Input Fields empty show a message
+    /// Check if Input Fields empty show a message
     if (!empty($ac) && !empty($pw)) {
 
+        /// If Email pattern don't match show error
         if (preg_match($emailPattern, $ac) == 1) {
 
             $password = hash('sha256', 'php123');
             $passHash = hash('sha256', $pw);
 
+            /// If password match then show  login msg
             if ($passHash == $password) {
 
                 error_log("Login success ".$_POST['email']);
@@ -52,6 +66,7 @@ if (isset($_POST['email']) && isset($_POST['pass'])) {
     return;
 }
 
+/// Check if any Error msg is set and then unset
 if (isset($_SESSION['error'])) {
     $msg = '<div class="alert alert-warning" role="alert">
             <strong>' . $_SESSION['error'] . '</strong>

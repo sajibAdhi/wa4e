@@ -1,7 +1,7 @@
 <?php
 require_once "pdo.php";
 session_start();
-// Show LogIn Success Message
+/// Show LogIn Success Message
 if (isset($_SESSION['success'])) {
     $msg = '<div class="alert alert-success" role="alert">
             <strong>' . $_SESSION['success'] . '</strong>
@@ -27,7 +27,7 @@ if (isset($_SESSION['success'])) {
 <body>
     <div class="container">
         <?php
-        // Check If Loged In. 
+        /// Check If Logged In or not. 
         if (!isset($_SESSION['name'])) :
         ?>
             <h1>Not Logged In</h1>

@@ -66,12 +66,12 @@ if (isset($_SESSION['success'])) {
                         <td><?= $users['email'] ?></td>
                         <td><?= $users['password'] ?></td>
                         <td>
-                            <a class="btn btn-danger" href="edit.php?id='<?= $users['id'] ?>''" role="button">
+                            <a class="btn btn-danger" href="edit.php?id=<?= $users['id'] ?>" role="button">
                                 Edit
                             </a>
                         </td>
                         <td>
-                            <a class="btn btn-warning" href="delete.php?id='<?= $users['id'] ?>''" role="button">
+                            <a class="btn btn-warning" href="delete.php?id=<?= $users['id'] ?>" role="button">
                                 Delete
                             </a>
                         </td>

@@ -2,6 +2,7 @@
 require_once "pdo.php";
 session_start();
 
+/// Set Error Message 
 if (isset($_SESSION['error'])) {
     $msg = '<div class="alert alert-warning" role="alert">
                 <strong>' . $_SESSION['error'] . '</strong>
@@ -9,6 +10,7 @@ if (isset($_SESSION['error'])) {
     unset($_SESSION['error']);
 }
 
+/// Set Success Message
 if (isset($_SESSION['success'])) {
     $msg = '<div class="alert alert-success" role="alert">
                 <strong>' . $_SESSION['success'] . '</strong>
@@ -20,7 +22,7 @@ if (isset($_SESSION['success'])) {
 <html lang="en">
 
 <head>
-    <title>Sajib Adhikary - INDEX</title>
+    <title>Sajib Adhikary - READ</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -30,7 +32,7 @@ if (isset($_SESSION['success'])) {
 </head>
 
 <body>
-    <div class="container-fluid">
+    <div class="container">
         <span><?= empty($msg) ? '' : $msg ?></span>
 
         <table class="table table-striped table-inverse table-responsive">

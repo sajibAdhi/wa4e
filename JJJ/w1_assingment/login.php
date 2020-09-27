@@ -1,4 +1,5 @@
 <?php
+require_once "pdo.php";
 session_start();
 
 /**
@@ -23,7 +24,7 @@ function test_input($data)
 if (isset($_POST['email']) && isset($_POST['pass'])) {
 
     /// Logout Current User
-    unset($_SESSION['user']);
+    unset($_SESSION['name']);
 
     /// Sanitization
     $ac = test_input($_POST['email']);
@@ -38,21 +39,31 @@ if (isset($_POST['email']) && isset($_POST['pass'])) {
         /// If Email pattern don't match show error
         if (preg_match($emailPattern, $ac) == 1) {
 
-            $password = hash('sha256', 'php123');
-            $passHash = hash('sha256', $pw);
 
-            /// If password match then show  login msg
-            if ($passHash == $password) {
+            $sql = "SELECT user_id, name, password FROM users WHERE email = :em";
+            $selectquery = $pdo->prepare($sql);
+            $data = $selectquery->execute(array(
+                ':em' => $ac,
+            ));
 
-                error_log("Login success ".$_POST['email']);
+            if (!empty($data)) {
 
-                $_SESSION['user'] = $ac;
-                $_SESSION['success'] = "LOG In Succcess";
-                header("Location: index.php");
-                return;
+                $password = hash('sha256', $pw);
+
+                if ($password == $data['password']) {
+
+                    $_SESSION['name'] = $data['name'];
+                    $_SESSION['user_id'] = $data['user_id'];
+                    $_SESSION['success'] = "LOG In Succcess";
+                    header("Location: index.php");
+                    return;
+                } else {
+
+                    $_SESSION['error'] = "Incorrect password";
+                }
             } else {
 
-                $_SESSION['error'] = "Incorrect password";
+                $_SESSION['error'] = "Incorrect User";
             }
         } else {
 
@@ -62,7 +73,7 @@ if (isset($_POST['email']) && isset($_POST['pass'])) {
 
         $_SESSION['error'] = "Email and Password are Required";
     }
-    error_log("Login fail ".$_POST['email']." $passHash");
+    error_log("Login fail " . $_POST['email'] . " $passHash");
     header("Location: login.php");
     return;
 }
@@ -89,39 +100,39 @@ if (isset($_SESSION['error'])) {
 </head>
 
 <body>
-<div class="container">
-    <h1>Please LogIn.....</h1>
+    <div class="container">
+        <h1>Please LogIn.....</h1>
 
-    <!-- Flash Message -->
-    <span><?= empty($msg) ? '' : $msg ?></span>
-    <!-- Form -->
-    <form method="POST">
-        <!-- Email -->
-        <div class="form-group row">
-            <label for="email" class="col-md-3 col-form-label">Email:</label>
-            <div class="col-md-9">
-                <input type="text" class="form-control" name="email" id="email" placeholder="">
+        <!-- Flash Message -->
+        <span><?= empty($msg) ? '' : $msg ?></span>
+        <!-- Form -->
+        <form method="POST">
+            <!-- Email -->
+            <div class="form-group row">
+                <label for="email" class="col-md-3 col-form-label">Email:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" name="email" id="email" placeholder="">
+                </div>
             </div>
-        </div>
-        <!-- Password -->
-        <div class="form-group row">
-            <label for="password" class="col-md-3 col-form-label">Password:</label>
-            <div class="col-md-9">
-                <input type="text" class="form-control" name="pass" id="password" placeholder="">
+            <!-- Password -->
+            <div class="form-group row">
+                <label for="password" class="col-md-3 col-form-label">Password:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" name="pass" id="password" placeholder="">
+                </div>
             </div>
-        </div>
-        <!-- Submit Button -->
-        <div class="form-group row">
-            <input type="submit" class="btn btn-primary" value="Log In">
-        </div>
-    </form>
-    <a class="btn btn-warning" href="index.php" role="button">Cancel</a>
-</div>
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+            <!-- Submit Button -->
+            <div class="form-group row">
+                <input type="submit" class="btn btn-primary" value="Log In">
+            </div>
+        </form>
+        <a class="btn btn-warning" href="index.php" role="button">Cancel</a>
+    </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </body>
 
 </html>

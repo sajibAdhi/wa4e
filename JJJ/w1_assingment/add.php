@@ -78,7 +78,7 @@ if (isset($_SESSION['error'])) {
     <div class="container">
         <span><?= empty($msg) ? '' : $msg ?></span>
         <?php if (!isset($_SESSION['name'])) : ?>
-            <h1>Access Denied</h1>
+            <h1>Not logged in</h1>
             <p>
                 Please <a href="login.php">Login</a> First
             </p>

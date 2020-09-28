@@ -3,7 +3,7 @@ require_once "pdo.php";
 session_start();
 
 if (!isset($_SESSION['name'])) {
-    die("Access Denied");
+    die("Not logged in.");
 }
 if (!isset($_GET['id'])) {
 
@@ -12,12 +12,13 @@ if (!isset($_GET['id'])) {
     return;
 }
 
-$selectQuery = "SELECT * FROM profile WHERE id = :xyz";
+$selectQuery = "SELECT * FROM profile WHERE id = :xyz, user_id = :uid";
 $select = $pdo->prepare($selectQuery);
 
 
 $select->execute(array(
     ":xyz" => $_GET['id'],
+    ":uid" => $_SESSION['user'],
 ));
 
 $data = $select->fetch(PDO::FETCH_ASSOC);
@@ -52,7 +53,7 @@ if (
     } else {
 
         /// update Query
-        $updateQuery = "UPDATE profiles SET first_name = :fn, last_name = :ln, email = :em, headline = :hl, summary = :su WHERE profile_id = :id";
+        $updateQuery = "UPDATE profiles SET first_name = :fn, last_name = :ln, email = :em, headline = :hl, summary = :su WHERE profile_id = :id, user_id = :uid";
 
         /// Prepare Query
         $update = $pdo->prepare($updateQuery);
@@ -110,50 +111,49 @@ if (isset($_SESSION['error'])) {
         <span><?= empty($msg) ? '' : $msg ?></span>
         <!-- Form -->
         <form method="POST">
-            <input type="hidden" name="id" value="<?= $_GET['id']?>">
-                <!-- First Name -->
-                <div class="form-group row">
-                    <label for="fname" class="col-md-3 col-form-label">First Name:</label>
-                    <div class="col-md-9">
-                        <input type="text" class="form-control"
-                            value="" name="fname" id="fname">
-                    </div>
+            <input type="hidden" name="id" value="<?= $_GET['id'] ?>">
+            <!-- First Name -->
+            <div class="form-group row">
+                <label for="fname" class="col-md-3 col-form-label">First Name:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" value="<?= htmlentities($data['first_name']) ?>" name="fname" id="fname">
                 </div>
-                <!-- Last Name -->
-                <div class="form-group row">
-                    <label for="lname" class="col-md-3 col-form-label">Last Name:</label>
-                    <div class="col-md-9">
-                        <input type="text" class="form-control" name="lname" id="lname">
-                    </div>
+            </div>
+            <!-- Last Name -->
+            <div class="form-group row">
+                <label for="lname" class="col-md-3 col-form-label">Last Name:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" value="<?= htmlentities($data['last_name']) ?>" name="lname" id="lname">
                 </div>
-                <!-- email -->
-                <div class="form-group row">
-                    <label for="email" class="col-md-3 col-form-label">Email:</label>
-                    <div class="col-md-9">
-                        <input type="text" class="form-control" name="email" id="email">
-                    </div>
+            </div>
+            <!-- email -->
+            <div class="form-group row">
+                <label for="email" class="col-md-3 col-form-label">Email:</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" value="<?= htmlentities($data['email']) ?>" name="email" id="email">
                 </div>
-                <!-- HEADLINE -->
-                <div class="form-group row">
-                    <label for="hline" class="col-md-3 col-form-label">Headline</label>
-                    <div class="col-md-9">
-                        <input type="text" class="form-control" name="headline" id="headline">
-                    </div>
+            </div>
+            <!-- HEADLINE -->
+            <div class="form-group row">
+                <label for="hline" class="col-md-3 col-form-label">Headline</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" value="<?= htmlentities($data['headline']) ?>" name="headline" id="headline">
                 </div>
-                <!-- Summary -->
-                <div class="form-group row">
-                    <label for="summary" class="col-md-3 col-form-label">Summary</label>
-                    <div class="col-md-9">
-                        <input type="text" class="form-control" name="summary" id="summary">
-                    </div>
+            </div>
+            <!-- Summary -->
+            <div class="form-group row">
+                <label for="summary" class="col-md-3 col-form-label">Summary</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" value="<?= htmlentities($data['summary']) ?>" name="summary" id="summary">
                 </div>
-                <!-- Add Button -->
-                <div class="form-group row">
-                    <div class="col-sm-10">
-                        <input class="btn btn-primary" type="submit" value="Add">
-                    </div>
+            </div>
+            <!-- Add Button -->
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <input class="btn btn-primary" type="submit" value="Edit">
                 </div>
-            </form>
+            </div>
+        </form>
     </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

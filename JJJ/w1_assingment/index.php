@@ -43,7 +43,8 @@ if (isset($_SESSION['success'])) {
             <p>Attempt to <a href="add.php">add data</a> without logging in</p>
         <?php else : ?>
             <?php
-            $selectQuery = "SELECT profile_id, first_name, last_name FROM profile";
+            $user =$_SESSION['user'];
+            $selectQuery = "SELECT profile_id, first_name, last_name FROM profile WHERE user_id = $user";
             $data = $pdo->query($selectQuery);
             if (!empty($data)) :
             ?>

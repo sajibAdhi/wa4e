@@ -25,6 +25,7 @@ if (isset($_POST['email']) && isset($_POST['pass'])) {
 
     /// Logout Current User
     unset($_SESSION['name']);
+    unset($_SESSION['user']);
 
     /// Sanitization
     $ac = test_input($_POST['email']);
@@ -53,7 +54,7 @@ if (isset($_POST['email']) && isset($_POST['pass'])) {
                 if ($password == $data['password']) {
 
                     $_SESSION['name'] = $data['name'];
-                    $_SESSION['user_id'] = $data['user_id'];
+                    $_SESSION['user'] = $data['user_id'];
                     $_SESSION['success'] = "LOG In Succcess";
                     header("Location: index.php");
                     return;

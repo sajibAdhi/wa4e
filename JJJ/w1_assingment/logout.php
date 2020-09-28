@@ -4,7 +4,7 @@ session_start();
 
 /// Unset Session
 unset($_SESSION['name']);
-unset($_SESSION['user_id']);
+unset($_SESSION['user']);
 
 
 header("Location: index.php");

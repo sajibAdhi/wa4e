@@ -5,6 +5,70 @@ session_start();
 if (!isset($_SESSION['name'])) {
     die("Not logged in.");
 }
+
+/// Update
+if (
+    isset($_POST['id']) &&
+    isset($_POST['first_name']) &&
+    isset($_POST['last_name']) &&
+    isset($_POST['email']) &&
+    isset($_POST['headline']) &&
+    isset($_POST['summary'])
+) {
+    $id = $_POST['id'];
+    $fn = $_POST['first_name'];
+    $ln = $_POST['last_name'];
+    $em = $_POST['email'];
+    $hl = $_POST['headline'];
+    $su = $_POST['summary'];
+
+
+    /// Check Empty
+    if (empty($fn) || empty($ln) || empty($em) || empty($hl) || empty($su)) {
+
+        $_SESSION['error'] = " All fields are required.";
+    } else {
+
+        if (preg_match($emailPattern, $em) == 1) {
+            /// update Query
+            $updateQuery = "UPDATE profile 
+                SET first_name = :fn, last_name = :ln, email = :em, headline = :hl, summary = :su 
+                WHERE profile_id = :pid && user_id = :uid";
+
+            /// Prepare Query
+            $prepare = $pdo->prepare($updateQuery);
+
+            /// Execute Query
+            $execute = $prepare->execute(array(
+                ':uid' => $_SESSION['user'],
+                ':fn' => $fn,
+                ':ln' => $ln,
+                ':em' => $em,
+                ':hl' => $hl,
+                ':su' => $su,
+                ':pid' => $id,
+            ));
+
+            /// If updateion seccessful then redirect to index.
+            if ($execute != false) {
+
+                $_SESSION['success'] = " Record edited";
+                header("Location: index.php");
+                return;
+            } else {
+                $_SESSION['error'] = "Record Failed to Update";
+            }
+        } else {
+            $_SESSION['error'] = "Email must have an at-sign (@)";
+            header("Location: edit.php?id=".$id);
+            return;
+        }
+
+        header("Location: index.php");
+        return;
+    }
+}
+
 if (!isset($_GET['id'])) {
 
     $_SESSION['error'] = "Missing profile id";
@@ -27,62 +91,6 @@ if ($data === FALSE) {
     $_SESSION['error'] = "Profile Id doesn't Exist";
     header("Location: index.php");
     return;
-}
-
-/// Update
-if (
-    isset($_POST['id']) &&
-    isset($_POST['fname']) &&
-    isset($_POST['lname']) &&
-    isset($_POST['email']) &&
-    isset($_POST['headline']) &&
-    isset($_POST['summary'])
-) {
-    $id = $_POST['id'];
-    $fn = $_POST['fname'];
-    $ln = $_POST['lname'];
-    $em = $_POST['email'];
-    $hl = $_POST['headline'];
-    $su = $_POST['summary'];
-
-
-    /// Check Empty
-    if (empty($fn) || empty($ln) || empty($em) || empty($hl) || empty($su)) {
-
-        $_SESSION['error'] = " All fields are required.";
-    } else {
-
-        /// update Query
-        $updateQuery = "UPDATE profile 
-            SET first_name = :fn, last_name = :ln, email = :em, headline = :hl, summary = :su 
-            WHERE profile_id = :pid && user_id = :uid";
-
-        /// Prepare Query
-        $prepare = $pdo->prepare($updateQuery);
-
-        /// Execute Query
-        $execute = $prepare->execute(array(
-            ':uid' => $_SESSION['user'],
-            ':fn' => $fn,
-            ':ln' => $ln,
-            ':em' => $em,
-            ':hl' => $hl,
-            ':su' => $su,
-            ':pid' => $id,
-        ));
-
-        /// If updateion seccessful then redirect to index.
-        if ($execute != false) {
-
-            $_SESSION['success'] = " Record edited";
-            header("Location: index.php");
-            return;
-        } else {
-            $_SESSION['error'] = "Record Failed to Update";
-            header("Location: index.php");
-            return;
-        }
-    }
 }
 
 
@@ -116,16 +124,16 @@ if (isset($_SESSION['error'])) {
             <input type="hidden" name="id" value="<?= $_GET['id'] ?>">
             <!-- First Name -->
             <div class="form-group row">
-                <label for="fname" class="col-md-3 col-form-label">First Name:</label>
+                <label for="first_name" class="col-md-3 col-form-label">First Name:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" value="<?= htmlentities($data['first_name']) ?>" name="fname" id="fname">
+                    <input type="text" class="form-control" value="<?= htmlentities($data['first_name']) ?>" name="first_name" id="first_name">
                 </div>
             </div>
             <!-- Last Name -->
             <div class="form-group row">
-                <label for="lname" class="col-md-3 col-form-label">Last Name:</label>
+                <label for="last_name" class="col-md-3 col-form-label">Last Name:</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" value="<?= htmlentities($data['last_name']) ?>" name="lname" id="lname">
+                    <input type="text" class="form-control" value="<?= htmlentities($data['last_name']) ?>" name="last_name" id="last_name">
                 </div>
             </div>
             <!-- email -->
@@ -152,7 +160,7 @@ if (isset($_SESSION['error'])) {
             <!-- Add Button -->
             <div class="form-group row">
                 <div class="col-sm-10">
-                    <input class="btn btn-primary" onclick="return doValidate();" type="submit" value="Edit">
+                    <input class="btn btn-primary" onclick="return doValidate();" type="submit" value="Save">
                 </div>
             </div>
         </form>
@@ -168,14 +176,13 @@ if (isset($_SESSION['error'])) {
 
             console.log('Validating...');
 
-            fn = document.getElementById('fname').value;
-            ln = document.getElementById('lname').value;
+            fn = document.getElementById('first_name').value;
+            ln = document.getElementById('last_name').value;
             em = document.getElementById('email').value;
             hl = document.getElementById('headline').value;
             su = document.getElementById('summary').value;
 
-            pw = document.getElementById('password').value;
-            console.log("Validating pw=" + pw);
+            console.log("Validating pw=" + fn);
 
             if (fn == null || fn == "" ||
                 ln == null || ln == "" ||

@@ -29,7 +29,6 @@ if ($execute === FALSE) {
 } else {
 
     $data = $prepare->fetch(PDO::FETCH_ASSOC);
-    var_dump($data);
 }
 
 if (isset($_POST['delete']) && isset($_POST['id'])) {

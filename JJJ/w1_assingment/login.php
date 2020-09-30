@@ -31,9 +31,6 @@ if (isset($_POST['email']) && isset($_POST['pass'])) {
     $ac = test_input($_POST['email']);
     $pw = test_input($_POST['pass']);
 
-    /// Email Pattern
-    $emailPattern = "/\b[\w\.-]+@/";
-
     /// Check if Input Fields empty show a message
     if (!empty($ac) && !empty($pw)) {
 

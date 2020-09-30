@@ -126,7 +126,7 @@ if (isset($_SESSION['error'])) {
                 <!-- Add Button -->
                 <div class="form-group row">
                     <div class="col-sm-10">
-                        <input class="btn btn-primary" onclick="return doValidation();" type="submit" value="Add">
+                        <input class="btn btn-primary" onclick="return doValidate();" type="submit" value="Add">
                     </div>
                 </div>
             </form>
@@ -151,8 +151,7 @@ if (isset($_SESSION['error'])) {
             hl = document.getElementById('headline').value;
             su = document.getElementById('summary').value;
 
-            pw = document.getElementById('password').value;
-            console.log("Validating pw=" + pw);
+            console.log("Validating pw=" + fn);
 
             if (fn == null || fn == "" ||
                 ln == null || ln == "" ||

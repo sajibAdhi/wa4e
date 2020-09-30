@@ -13,30 +13,33 @@ if (!isset($_GET['id'])) {
     return;
 }
 
-$selectQuery = "SELECT make, id FROM autos WHERE id = :xyz, user_id = :uid";
-$select = $pdo->prepare($selectQuery);
+$selectQuery = "SELECT profile_id, first_name FROM profile WHERE profile_id = :xyz && user_id = :uid";
+$prepare = $pdo->prepare($selectQuery);
 
-$select->execute(array(
+$execute = $prepare->execute(array(
     ":xyz" => $_GET['id'],
     ":uid" => $_SESSION['user'],
 ));
 
-$data = $select->fetch(PDO::FETCH_ASSOC);
-
-if ($data === FALSE) {
+if ($execute === FALSE) {
 
     $_SESSION['error'] = "Bad Value For Profiles Id";
     header("Location: index.php");
     return;
+} else {
+
+    $data = $prepare->fetch(PDO::FETCH_ASSOC);
+    var_dump($data);
 }
 
 if (isset($_POST['delete']) && isset($_POST['id'])) {
 
-    $deleteSql = "DELETE FROM autos where id = :zap";
-    $prepareSql = $pdo->prepare($deleteSql);
+    $deleteSql = "DELETE FROM profile where profile_id = :pid && user_id = :uid";
+    $prepare = $pdo->prepare($deleteSql);
 
-    $delete = $prepareSql->execute(array(
-        ':zap' => $_POST['id'],
+    $execute = $prepare->execute(array(
+        ':pid' => $_POST['id'],
+        ':uid' => $_SESSION['user'],
     ));
 
     if ($delete === FALSE) {
@@ -68,9 +71,9 @@ if (isset($_POST['delete']) && isset($_POST['id'])) {
 <body>
 
     <div class="container">
-        <h1>Confirm: Deleting auto : <?= htmlentities($data['make']) ?></h1>
+        <h1>Confirm: Deleting : <?= htmlentities($data['first_name']) ?></h1>
         <form method="post">
-            <input type="hidden" name="id" value="<?= $data['id'] ?>">
+            <input type="hidden" name="id" value="<?= $data['profile_id'] ?>">
             <input type="submit" name="delete" value="Delete">
         </form>
         <a class="btn btn-primary" href="index.php" role="button">Cancel</a>

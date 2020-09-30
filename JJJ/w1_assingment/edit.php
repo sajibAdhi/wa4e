@@ -12,16 +12,16 @@ if (!isset($_GET['id'])) {
     return;
 }
 
-$selectQuery = "SELECT * FROM profile WHERE id = :xyz, user_id = :uid";
-$select = $pdo->prepare($selectQuery);
+$selectQuery = "SELECT * FROM profile WHERE user_id = :uid && profile_id = :pid";
+$prepare = $pdo->prepare($selectQuery);
 
 
-$select->execute(array(
-    ":xyz" => $_GET['id'],
+$execute = $prepare->execute(array(
     ":uid" => $_SESSION['user'],
+    ":pid" => $_GET['id'],
 ));
 
-$data = $select->fetch(PDO::FETCH_ASSOC);
+$data = $prepare->fetch(PDO::FETCH_ASSOC);
 if ($data === FALSE) {
 
     $_SESSION['error'] = "Profile Id doesn't Exist";
@@ -47,30 +47,32 @@ if (
 
 
     /// Check Empty
-    if (empty($fn) || empty($ln) || empty($email) || empty($hl) || empty($su)) {
+    if (empty($fn) || empty($ln) || empty($em) || empty($hl) || empty($su)) {
 
         $_SESSION['error'] = " All fields are required.";
     } else {
 
         /// update Query
-        $updateQuery = "UPDATE profiles SET first_name = :fn, last_name = :ln, email = :em, headline = :hl, summary = :su WHERE profile_id = :id, user_id = :uid";
+        $updateQuery = "UPDATE profile 
+            SET first_name = :fn, last_name = :ln, email = :em, headline = :hl, summary = :su 
+            WHERE profile_id = :pid && user_id = :uid";
 
         /// Prepare Query
-        $update = $pdo->prepare($updateQuery);
+        $prepare = $pdo->prepare($updateQuery);
 
         /// Execute Query
-        $success = $update->execute(array(
-            ':uid' => $_SESSION['user_id'],
+        $execute = $prepare->execute(array(
+            ':uid' => $_SESSION['user'],
             ':fn' => $fn,
             ':ln' => $ln,
             ':em' => $em,
-            ':he' => $hl,
+            ':hl' => $hl,
             ':su' => $su,
-            ':id' => $id
+            ':pid' => $id,
         ));
 
         /// If updateion seccessful then redirect to index.
-        if ($success != false) {
+        if ($execute != false) {
 
             $_SESSION['success'] = " Record edited";
             header("Location: index.php");
@@ -150,16 +152,45 @@ if (isset($_SESSION['error'])) {
             <!-- Add Button -->
             <div class="form-group row">
                 <div class="col-sm-10">
-                    <input class="btn btn-primary" type="submit" value="Edit">
+                    <input class="btn btn-primary" onclick="return doValidate();" type="submit" value="Edit">
                 </div>
             </div>
         </form>
     </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- Custom Js -->
+    <script>
+        function doValidate() {
+
+            console.log('Validating...');
+
+            fn = document.getElementById('fname').value;
+            ln = document.getElementById('lname').value;
+            em = document.getElementById('email').value;
+            hl = document.getElementById('headline').value;
+            su = document.getElementById('summary').value;
+
+            pw = document.getElementById('password').value;
+            console.log("Validating pw=" + pw);
+
+            if (fn == null || fn == "" ||
+                ln == null || ln == "" ||
+                em == null || em == "" ||
+                hl == null || hl == "" ||
+                su == null || su == ""
+            ) {
+
+                alert("All fields are required");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 </body>
 
 </html>

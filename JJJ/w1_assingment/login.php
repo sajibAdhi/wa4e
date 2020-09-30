@@ -41,16 +41,19 @@ if (isset($_POST['email']) && isset($_POST['pass'])) {
         if (preg_match($emailPattern, $ac) == 1) {
 
 
-            $sql = "SELECT user_id, name, password FROM users WHERE email = :em";
-            $selectquery = $pdo->prepare($sql);
-            $data = $selectquery->execute(array(
+            $selectquery = "SELECT user_id, name, password FROM users WHERE email = :em";
+            $prepare = $pdo->prepare($selectquery);
+            $execute = $prepare->execute(array(
                 ':em' => $ac,
             ));
 
-            if (!empty($data)) {
+            if ($execute != FALSE) {
 
-                $password = hash('sha256', $pw);
-
+                $data = $prepare->fetch();
+                $salt = 'XyZzy12*_';
+                $password = hash('md5', $salt . $pw);
+                echo $data['password'] . "<br>";
+                echo $password;
                 if ($password == $data['password']) {
 
                     $_SESSION['name'] = $data['name'];
@@ -74,7 +77,7 @@ if (isset($_POST['email']) && isset($_POST['pass'])) {
 
         $_SESSION['error'] = "Email and Password are Required";
     }
-    error_log("Login fail " . $_POST['email'] . " $passHash");
+    error_log("Login fail " . $_POST['email'] . " $pw");
     header("Location: login.php");
     return;
 }
@@ -124,16 +127,35 @@ if (isset($_SESSION['error'])) {
             </div>
             <!-- Submit Button -->
             <div class="form-group row">
-                <input type="submit" class="btn btn-primary" value="Log In">
+                <input type="submit" onclick="return doValidate();" class="btn btn-primary" value="Log In">
             </div>
         </form>
         <a class="btn btn-warning" href="index.php" role="button">Cancel</a>
     </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- Custom Js -->
+    <script>
+        function doValidate() {
+
+            console.log('Validating...');
+
+            em = document.getElementById('email').value
+            pw = document.getElementById('password').value;
+            console.log("Validating pw=" + pw);
+
+            if (pw == null || pw == "" || em == null || em == "") {
+
+                alert("All fields are required");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 </body>
 
 </html>

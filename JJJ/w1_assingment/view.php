@@ -17,11 +17,11 @@ if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
     if (is_numeric($id)) {
-        $sql = "SELECT * FROM profile WHERE id = :profile_id";
+        $sql = "SELECT * FROM profile WHERE profile_id = :pid";
         $selectQuery = $pdo->prepare($sql);
 
         $selectQuery->execute(array(
-            ':profile_id' => $id,
+            ':pid' => $id,
         ));
 
         $data = $selectQuery->fetch(PDO::FETCH_ASSOC);

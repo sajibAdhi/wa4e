@@ -73,7 +73,7 @@ if (isset($_SESSION['success'])) {
                     <tbody>
                         <?php while ($users = $data->fetch(PDO::FETCH_ASSOC)) : ?>
                             <tr>
-                                <td scope="row"><?= htmlentities($users['profile_']) ?></td>
+                                <td scope="row"><?= htmlentities($users['profile_id']) ?></td>
                                 <td><?= htmlentities($users['first_name']) ?></td>
                                 <td><?= htmlentities($users['last_name']) ?></td>
                                 <td>
@@ -87,7 +87,7 @@ if (isset($_SESSION['success'])) {
                                     </a>
                                 </td>
                                 <td>
-                                    <a class="btn btn-warning" href="delete.php?id=<?= $users['id'] ?>" role="button">
+                                    <a class="btn btn-warning" href="delete.php?id=<?= $users['profile_id'] ?>" role="button">
                                         Delete
                                     </a>
                                 </td>

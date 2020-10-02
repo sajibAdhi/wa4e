@@ -1,3 +1,4 @@
+<?php require_once"Model/addModel.php"; ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,10 +12,10 @@
 
 <body>
     <div class="container">
-        <h1>Adding Profile for <?= empty($_SESSION['user']) ? '' : $_SESSION['user'] ?></h1>
+        <h1>Add Resume From Sajib</h1>
         <br>
         <br>
-        <form>
+        <form method="POST">
             <!-- First Name -->
             <div class="form-group row">
                 <label for="first_name" class="col-md-3 col-form-label">First Name:</label>
@@ -51,22 +52,8 @@
                 </div>
             </div>
             <!-- New  Positions -->
-            <div class="newPositions">
-                <div id="position">
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Year</label>
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" name="year">
-                        </div>
-                        <button type="button" class="btn btn-warning">-</button>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Position</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="position">
-                        </div>
-                    </div>
-                </div>
+            <div id="positionFields">
+                
             </div>
             <!-- position -->
             <div class="form-group row">
@@ -78,10 +65,11 @@
             <!-- Add Button -->
             <div class="form-group row">
                 <div class="col-md-12">
-                    <button type="submit" class="btn btn-primary">Action</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
                 </div>
             </div>
         </form>
+        <a name="" id="" class="btn btn-secondary" href="index.php" role="button">Cancle</a>
     </div>
     <br>
     <br>
@@ -102,12 +90,22 @@
                 }
                 countPos++;
                 window.console && console.log("Adding position " + countPos);
-                $('#position_fields').append(
+                $('#positionFields').append(
                     '<div id="position' + countPos + '"> \
-                        <p>Year: <input type="text" name="year' + countPos + '" value="" /> \
-                        <input type="button" value="-" \
-                        onclick="$(\'#position' + countPos + '\').remove();return false;"></p> \
-                        <textarea name="desc' + countPos + '" rows="8" cols="80"></textarea>\
+                        <div class="form-group row"> \
+                            <label class="col-md-3 col-form-label">Year</label> \
+                            <div class="col-md-6"> \
+                                <input type="text" class="form-control" name="year'+ countPos +'"> \
+                            </div> \
+                            <button type="button" onclick="$(\'#position' + countPos + '\').remove();return false;" \
+                            class="btn btn-warning">-</button> \
+                        </div> \
+                        <div class="form-group row"> \
+                            <label class="col-md-3 col-form-label">Position</label> \
+                            <div class="col-md-9"> \
+                                <input type="text" class="form-control" name="position'+countPos+'"> \
+                            </div> \
+                        </div> \
                     </div>'
                 );
             });

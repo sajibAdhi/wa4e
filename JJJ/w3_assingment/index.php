@@ -1,4 +1,4 @@
-<?php require_once "readModel.php"; ?>
+<?php require_once "Model/readModel.php"; ?>
 <!doctype html>
 <html lang="en">
 
@@ -31,7 +31,9 @@
         <?php endif; ?>
         <br>
         <br>
-        <?php if (!empty($datas)) : ?>
+        <?php
+            $datas = allProfileList($pdo);
+        if (!empty($datas)) : ?>
             <table class="table table-striped table-inverse table-responsive">
                 <thead class="thead-inverse">
                     <tr>

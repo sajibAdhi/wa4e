@@ -1,5 +1,4 @@
-<?php
-    require_once "baseModel.php";
+<?php require_once "baseModel.php";
 
     function allProfileList($pdo){
         $selectSql = "SELECT profile_id, first_name, last_name, headline FROM profile";
@@ -17,6 +16,17 @@
             $_SESSION['error'] = "Profile Not Found";
             header("Location: index.php");
             return;
+        }
+    }
+
+    function loadPos($pdo, $id){
+        $selectSql = "SELECT * FROM position WHERE profile_id = :id ORDER BY rank";
+        $prepare = $pdo->prepare($selectSql);
+        $execute = $prepare->execute(array( ':id' => $id));
+        if($execute == TRUE){
+            return $prepare->fetchAll(PDO::FETCH_ASSOC);
+        }else {
+            return FALSE;
         }
     }
     

@@ -7,8 +7,10 @@ if(!isset($_GET['profile_id'])){
     return;
 } 
 else {
-    
+
     $data = getSingleProfile($pdo, $_GET['profile_id']);
+    $positions = loadPos($pdo,$_GET['profile_id']);
+    // var_dump($positions);
 }
 ?>
 <!DOCTYPE html>
@@ -61,12 +63,19 @@ else {
         </div>
         <!-- New  Positions -->
         <div id="positionFields">
-
+            <?php if($positions  != FALSE) :?>
+                Position
+                <ul>
+                    <?php for($i = 0; $i< count($positions); $i++) : ?>
+                    <li>Year : <?= $positions[$i]['year'] ?> Description : <?= $positions[$i]['description']?></li>
+                    <?php endfor?>
+                </ul>
+            <?php endif?>
         </div>
         <!-- Add Button -->
         <div class="form-group row">
             <div class="col-md-12">
-                <a name="" id="" class="btn btn-primary" href="#" role="button">Done</a>
+                <a name="" id="" class="btn btn-primary" href="index.php" role="button">Done</a>
             </div>
         </div>
     </div>

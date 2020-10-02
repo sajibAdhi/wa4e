@@ -64,10 +64,10 @@
                             <td><?= htmlentities($data['headline'])?></td>
                             <?php if (isset($_SESSION['user'])) : ?>
                                 <td>
-                                    <a name="" id="" class="btn btn-danger" href="#" role="button">Edit</a>
+                                    <a name="" id="" class="btn btn-danger" href="edit.php?profile_id=<?= $data['profile_id']?>" role="button">Edit</a>
                                 </td>
                                 <td>
-                                    <a name="" id="" class="btn btn-warning" href="#" role="button">Delete</a>
+                                    <a name="" id="" class="btn btn-warning" href="delete.php?profile_id=<?= $data['profile_id']?>" role="button">Delete</a>
                                 </td>
                             <?php endif; ?>
                         </tr>

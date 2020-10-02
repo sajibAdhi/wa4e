@@ -1,4 +1,4 @@
-<?php require_once "baseController.php";?>
+<?php require_once "readModel.php"; ?>
 <!doctype html>
 <html lang="en">
 
@@ -21,40 +21,60 @@
         <span><?= empty($msg) ? '' : $msg ?></span>
         <br>
         <br>
-        <p><a href="login.php">Please Log In</a></p>
-        <p><a href="logout.php">Logout</a></p>
+        <?php if (!isset($_SESSION['user'])) : ?>
+            <p><a href="login.php">Please Log In</a></p>
+        <?php else : ?>
+            <p><a href="logout.php">Logout</a></p>
+            <p>
+                <a name="" id="" class="btn btn-primary" href="add.php" role="button">Add New Entry</a>
+            </p>
+        <?php endif; ?>
         <br>
         <br>
-        <table class="table table-striped table-inverse table-responsive">
-            <thead class="thead-inverse">
-                <tr>
-                    <th>Name</th>
-                    <th>Headline</th>
-                    <th colspan="2">Action</th>
-                </tr>
-            </thead>
-            <tfoot class="thead-inverse">
-                <tr>
-                    <th>Name</th>
-                    <th>Headline</th>
-                    <th>Action</th>
-                </tr>
-            </tfoot>
-            <tbody>
-                <tr>
-                    <td>Sajib Adhikary</td>
-                    <td>Web Pogrammer</td>
-                    <td>
-                        <a name="" id="" class="btn btn-danger" href="#" role="button">Edit</a>
-                    </td>
-                    <td>
-                        <a name="" id="" class="btn btn-warning" href="#" role="button">Delete</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <?php if (!empty($datas)) : ?>
+            <table class="table table-striped table-inverse table-responsive">
+                <thead class="thead-inverse">
+                    <tr>
+                        <th>Name</th>
+                        <th>Headline</th>
+                        <?php if (isset($_SESSION['user'])) : ?>
+                            <th colspan="2">Action</th>
+                        <?php endif; ?>
+                    </tr>
+                </thead>
+                <tfoot class="thead-inverse">
+                    <tr>
+                        <th>Name</th>
+                        <th>Headline</th>
+                        <?php if (isset($_SESSION['user'])) : ?>
+                            <th>Action</th>
+                        <?php endif; ?>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    <?php while ($data = $datas->fetch(PDO::FETCH_ASSOC)) : ?>
+                        <tr>
+                            <td>
+                                <a href="view.php?profile_id=<?= $data['profile_id'] ?>">
+                                    <?= htmlentities($data['first_name']." ".$data['last_name']) ?>
+                                </a>
+                            </td>
+                            <td><?= htmlentities($data['headline'])?></td>
+                            <?php if (isset($_SESSION['user'])) : ?>
+                                <td>
+                                    <a name="" id="" class="btn btn-danger" href="#" role="button">Edit</a>
+                                </td>
+                                <td>
+                                    <a name="" id="" class="btn btn-warning" href="#" role="button">Delete</a>
+                                </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
         <br>
-        <a name="" id="" class="btn btn-primary" href="add.php" role="button">Add New Entry</a>
+        <br>
     </div>
     <?php require_once "script.php"; ?>
 </body>

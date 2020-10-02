@@ -1,7 +1,23 @@
 <?php
-    require_once "baseController.php";
+    require_once "baseModel.php";
 
-    $selectSql = "SELECT profile_id, first_name, last_name, headline FROM profile";
+    function allProfileList($pdo){
+        $selectSql = "SELECT profile_id, first_name, last_name, headline FROM profile";
+        return $pdo->query($selectSql);
+    }
     
-    $datas = $pdo->query($selectSql);
+    function getSingleProfile($pdo, $id){
+        $selectSql = "SELECT * FROM profile WHERE profile_id = :id";
+        $prepare = $pdo->prepare($selectSql);
+        $execute = $prepare->execute(array( ':id' => $id));
+
+        if($execute === TRUE){
+            return $prepare->fetch(PDO::FETCH_ASSOC);
+        } else {
+            $_SESSION['error'] = "Profile Not Found";
+            header("Location: index.php");
+            return;
+        }
+    }
+    
 ?>

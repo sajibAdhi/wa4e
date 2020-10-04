@@ -39,7 +39,7 @@
             <!-- Submit Button -->
             <div class="form-group row">
                 <div class="col-md-12">
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <button type="submit" class="btn btn-primary">Log In</button>
                 </div>
             </div>
         </form>

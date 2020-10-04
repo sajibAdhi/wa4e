@@ -22,7 +22,7 @@
         <br>
         <br>
         <?php if (!isset($_SESSION['user'])) : ?>
-            <p><a href="login.php">Please Log In</a></p>
+            <p><a href="login.php">Please log in</a></p>
         <?php else : ?>
             <p><a href="logout.php">Logout</a></p>
             <p>

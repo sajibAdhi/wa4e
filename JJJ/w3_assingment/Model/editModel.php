@@ -89,11 +89,19 @@ if (
     /// If updateion seccessful then redirect to index.
     if ($execute != false) {
 
+        $msg = validatePos();
+        if (is_string($msg)) {
+            $_SESSION['error'] = $msg;
+            header("Location: edit.php?profile_id=".$_GET['profile_id']);
+            return;
+        }
+
         $deleteSql = "DELETE FROM position WHERE profile_id = :pid";
         $prepare = $pdo->prepare($deleteSql);
         $execute = $prepare->execute(array(':pid' => $_GET['profile_id']));
 
         if ($execute != FALSE) {
+
             $rank = 1;
             for ($i = 1; $i <= 9; $i++) {
                 if (!isset($_POST['year' . $i])) continue;
@@ -105,7 +113,7 @@ if (
                 $insertSql = "INSERT INTO position (profile_id, rank, year, description) VALUES (:pid, :r, :y, :d)";
                 $prepare = $pdo->prepare($insertSql);
                 $execute = $prepare->execute(array(
-                    ':pid' => $profile_id,
+                    ':pid' => $_GET['profile_id'],
                     ':r' => $rank,
                     ':y' => $year,
                     ':d' => $post,

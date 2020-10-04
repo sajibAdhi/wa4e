@@ -42,29 +42,39 @@ if (
     if ($success != false) {
 
         $profile_id = $pdo->lastInsertId();
-        $rank = 1;
-        for($i=1; $i<=9; $i++){
-            if( !isset($_POST['year'.$i])) continue;
-            if( !isset($_POST['position'.$i])) continue;
+        $msg = validatePos();
+        if (is_string($msg)) {
+            $_SESSION['error'] = $msg;
+            header("Location: add.php");
+            return;
+        } else {
+            $rank = 1;
+            for ($i = 1; $i <= 9; $i++) {
+                if (!isset($_POST['year' . $i])) continue;
+                if (!isset($_POST['position' . $i])) continue;
 
-            $year = $_POST['year'.$i];
-            $post = $_POST['position'.$i];
+                $year = $_POST['year' . $i];
+                $post = $_POST['position' . $i];
 
-            $insertSql = "INSERT INTO position (profile_id, rank, year, description) VALUES (:pid, :r, :y, :d)";
-            $prepare = $pdo->prepare($insertSql);
-            $execute = $prepare->execute(array(
-                ':pid' => $profile_id,
-                ':r' => $rank,
-                ':y' => $year,
-                ':d' => $post,
-            ));
+                $insertSql = "INSERT INTO position (profile_id, rank, year, description) VALUES (:pid, :r, :y, :d)";
+                $prepare = $pdo->prepare($insertSql);
+                $execute = $prepare->execute(array(
+                    ':pid' => $profile_id,
+                    ':r' => $rank,
+                    ':y' => $year,
+                    ':d' => $post,
+                ));
 
-            $rank++;
+                $rank++;
+            }
+
+            $_SESSION['success'] = " Record added";
+            header("Location: index.php");
+            return;
         }
 
-        $_SESSION['success'] = " Record added";
-        header("Location: index.php");
-        return;
+
+        
     } else {
 
         $_SESSION['error'] = "Record Inserted Failed";

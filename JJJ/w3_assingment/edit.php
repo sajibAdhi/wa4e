@@ -15,10 +15,12 @@
 <body>
 
     <div class="container">
+        <br>
+        <br>
         <span><?= empty($msg) ? '' : $msg ?></span>
         <!-- Form -->
         <form method="POST">
-            <input type="hidden" name="id" value="<?= $_GET['id'] ?>">
+            <input type="hidden" name="id" value="<?= $data['profile_id'] ?>">
             <!-- First Name -->
             <div class="form-group row">
                 <label for="first_name" class="col-md-3 col-form-label">First Name:</label>
@@ -78,10 +80,17 @@
                     <?php endfor ?>
                 <?php endif ?>
             </div>
+            <!-- position -->
+            <div class="form-group row">
+                <label for="addPos" class="col-md-3 col-form-label">Position</label>
+                <div class="col-md-9">
+                    <button type="button" id="addPos" class="btn btn-warning">+</button>
+                </div>
+            </div>
             <!-- Add Button -->
             <div class="form-group row">
                 <div class="col-sm-10">
-                    <input class="btn btn-primary" onclick="return doValidate();" type="submit" value="Save">
+                    <input class="btn btn-primary" type="submit" value="Save">
                 </div>
             </div>
         </form>
@@ -93,6 +102,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <!-- Custom Js -->
     <script>
+        countPos = 0;
         $(document).ready(function() {
             window.console && console.log('Document ready called');
             $('#addPos').click(function(event) {

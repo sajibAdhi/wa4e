@@ -12,7 +12,12 @@
 
 <body>
     <div class="container">
+        <br>
+        <br>
         <h1>Add Resume From Sajib</h1>
+        <br>
+        <br>
+        <span><?= empty($msg) ? '' : $msg ?></span>
         <br>
         <br>
         <form method="POST">

@@ -1,166 +1,334 @@
-<?php require_once "Model/editModel.php"; ?>
-<!doctype html>
-<html lang="en">
+<?php require "include/pdo.php";
 
-<head>
-    <title>Sajib Adhikary - UPDATE</title>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+//if session don't have name
+if (empty($_SESSION['user'])) {
+    die("ACCESS DENIED");
+} //display data on form
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-</head>
+elseif (!empty($_GET['profile_id']) && empty($_POST['insert'])) {
+    $profile_id = intval($_GET['profile_id']);
 
-<body>
+    //display form fields with old one's
+    $sql = "SELECT * FROM `profile` WHERE `profile_id` = :profile;";
+    $statement = $pdo->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 
-    <div class="container">
-        <br>
-        <br>
-        <span><?= empty($msg) ? '' : $msg ?></span>
-        <!-- Form -->
-        <form method="POST">
-            <input type="hidden" name="id" value="<?= $data['profile_id'] ?>">
-            <!-- First Name -->
-            <div class="form-group row">
-                <label for="first_name" class="col-md-3 col-form-label">First Name:</label>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" value="<?= htmlentities($data['first_name']) ?>" name="first_name" id="first_name">
-                </div>
-            </div>
-            <!-- Last Name -->
-            <div class="form-group row">
-                <label for="last_name" class="col-md-3 col-form-label">Last Name:</label>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" value="<?= htmlentities($data['last_name']) ?>" name="last_name" id="last_name">
-                </div>
-            </div>
-            <!-- email -->
-            <div class="form-group row">
-                <label for="email" class="col-md-3 col-form-label">Email:</label>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" value="<?= htmlentities($data['email']) ?>" name="email" id="email">
-                </div>
-            </div>
-            <!-- HEADLINE -->
-            <div class="form-group row">
-                <label for="hline" class="col-md-3 col-form-label">Headline</label>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" value="<?= htmlentities($data['headline']) ?>" name="headline" id="headline">
-                </div>
-            </div>
-            <!-- Summary -->
-            <div class="form-group row">
-                <label for="summary" class="col-md-3 col-form-label">Summary</label>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" value="<?= htmlentities($data['summary']) ?>" name="summary" id="summary">
-                </div>
-            </div>
-            <!-- New  Positions -->
-            <div id="positionFields">
-                <?php
-                // var_dump($positions);
-                if ($positions  != FALSE) : ?>
-                    <?php for ($i = 0; $i < count($positions); $i++) : ?>
-                        <div id="position<?= $i ?>">
-                            <div class="form-group row">
-                                <label class="col-md-3 col-form-label">Year</label>
-                                <div class="col-md-6">
-                                    <input type="text" class="form-control" name="year<?= $i ?>" value="<?= $positions[$i]['year']?>">
-                                </div>
-                                <button type="button" onclick="$('#position<?= $i ?>').remove();return false;" class="btn btn-warning">-</button>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-md-3 col-form-label">Position</label>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" name="position<?= $i ?>" value="<?= $positions[$i]['description'] ?>" >
-                                </div>
-                            </div>
-                        </div>
-                    <?php endfor ?>
-                <?php endif ?>
-            </div>
-            <!-- position -->
-            <div class="form-group row">
-                <label for="addPos" class="col-md-3 col-form-label">Position</label>
-                <div class="col-md-9">
-                    <button type="button" id="addPos" class="btn btn-warning">+</button>
-                </div>
-            </div>
-            <!-- Add Button -->
-            <div class="form-group row">
-                <div class="col-sm-10">
-                    <input class="btn btn-primary" type="submit" value="Save">
-                </div>
-            </div>
-        </form>
-    </div>
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <!-- Custom Js -->
-    <script>
-        countPos = 0;
-        $(document).ready(function() {
-            window.console && console.log('Document ready called');
-            $('#addPos').click(function(event) {
+    $statement->execute(array(
+        ':profile' => $profile_id
+    ));
 
-                event.preventDefault();
-                if (countPos >= 9) {
-                    alert("Maximum of nine position entries exceeded");
-                    return;
-                }
-                countPos++;
-                window.console && console.log("Adding position " + countPos);
-                $('#positionFields').append(
-                    '<div id="position' + countPos + '"> \
-                        <div class="form-group row"> \
-                            <label class="col-md-3 col-form-label">Year</label> \
-                            <div class="col-md-6"> \
-                                <input type="text" class="form-control" name="year' + countPos + '"> \
-                            </div> \
-                            <button type="button" onclick="$(\'#position' + countPos + '\').remove();return false;" \
-                            class="btn btn-warning">-</button> \
-                        </div> \
-                        <div class="form-group row"> \
-                            <label class="col-md-3 col-form-label">Position</label> \
-                            <div class="col-md-9"> \
-                                <input type="text" class="form-control" name="position' + countPos + '"> \
-                            </div> \
-                        </div> \
-                    </div>'
-                );
-            });
-        });
+    $profile = ($statement->rowCount() > 0)
+        ? $statement->fetchAll(PDO::FETCH_ASSOC)[0]
+        : null;
 
-        function doValidate() {
+    //positions
+    //display form fields with old one's
+    $sql = "SELECT * FROM `position` WHERE `profile_id` = :profile;";
+    $statement = $pdo->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 
-            console.log('Validating...');
+    $statement->execute(array(
+        ':profile' => $profile_id
+    ));
 
-            fn = document.getElementById('first_name').value;
-            ln = document.getElementById('last_name').value;
-            em = document.getElementById('email').value;
-            hl = document.getElementById('headline').value;
-            su = document.getElementById('summary').value;
+    $positions = ($statement->rowCount() > 0)
+        ? $statement->fetchAll(PDO::FETCH_ASSOC)
+        : null;
+} //update form data
 
-            console.log("Validating pw=" + fn);
+elseif (!empty($_GET['profile_id']) && !empty($_POST['insert'])) {
+    $error = $confirm = $positions = [];
+    $profile_id = intval($_GET['profile_id']);
 
-            if (fn == null || fn == "" ||
-                ln == null || ln == "" ||
-                em == null || em == "" ||
-                hl == null || hl == "" ||
-                su == null || su == ""
-            ) {
+//Email Validation
+    $first = filter_var(htmlentities($_POST['first_name']), FILTER_SANITIZE_STRING);
+    $last = filter_var(htmlentities($_POST['last_name']), FILTER_SANITIZE_STRING);
+    $email = filter_var(htmlentities($_POST['email']), FILTER_SANITIZE_EMAIL);
+    $headline = filter_var(htmlentities($_POST['headline']), FILTER_SANITIZE_STRING);
+    $summary = filter_var(htmlentities($_POST['summary']), FILTER_SANITIZE_STRING);
+    $user_id = $_SESSION['user']['user_id'];
 
-                alert("All fields are required");
-                return false;
+    if (count($_POST['year']) > 0 && count($_POST['description']) > 0) {
+        for ($i = 0; $i < count($_POST['year']); $i++) {
+            if (preg_match("/[\d]+$/", $_POST['year'][$i]) == 0) {
+                array_push($error, "Year must be numeric");
+                break;
             }
-
-            return true;
+            array_push($positions, [
+                'year' => $_POST['year'][$i],
+                'rank' => $i,
+                'des' => $_POST['description'][$i],
+            ]);
         }
-    </script>
-</body>
+    }
 
+//Make Value validation
+    if ($first == '' || $first == NULL || $last == '' || $last == NULL
+        || $email == '' || $email == NULL || $headline == '' || $email == NULL
+        || $summary == '' || $summary == NULL
+    ) {
+        array_push($error, "All fields are required");
+    } else if (filter_var($email, FILTER_VALIDATE_EMAIL) == false) {
+        array_push($error, "Email address must contain @");
+    }
+
+//no error found && validation passed
+    if (count($error) == 0) {
+        $proof = true;
+        $pdo->beginTransaction();
+
+        $sql = 'UPDATE profile SET `user_id` = :uid, `first_name` = :fn, `last_name` = :ln, ' .
+            '`email` = :em, `headline` = :he, `summary` = :su WHERE `profile_id` = :id';
+        $stmt = $pdo->prepare($sql);
+        $proof = $stmt->execute([
+            ':id' => $profile_id,
+            ':uid' => $user_id,
+            ':fn' => $first,
+            ':ln' => $last,
+            ':em' => $email,
+            ':he' => $headline,
+            ':su' => $summary,
+        ]);
+
+        //update positions
+        if ($proof == true) {
+            // delete content
+            $sql = "DELETE FROM `position` WHERE  `profile_id` = :id;";
+            $stmt = $pdo->prepare($sql);
+            $proof = $stmt->execute([
+                ':id' => $profile_id,
+            ]);
+
+            //add positions
+            if (!empty($positions) && $proof == true) {
+
+                $sql = 'INSERT INTO `position` (`profile_id`, `rank`, `year`, `description`) ' .
+                    'VALUES (:profile, :rank, :year, :des);';
+                $stmt = $pdo->prepare($sql);
+
+                foreach ($positions as $position) {
+                    $proof = $stmt->execute([
+                        ':profile' => $profile_id,
+                        ':rank' => $position['rank'],
+                        ':year' => htmlentities($position['year']),
+                        ':des' => htmlentities($position['des']),
+                    ]);
+
+                    if ($proof == false) break;
+                }
+            }
+        }
+        //edit failed
+        if ($proof == false) {
+            $pdo->rollBack();
+            error_log("profile edited Failed");
+            $confirm = ['type' => 'text-danger', 'msg' => "profile edited Failed"];
+        } //edit succeed
+        else {
+            $pdo->commit();
+            error_log("profile edited");
+            $confirm = ['type' => 'text-success', 'msg' => "profile edited"];
+        }
+
+        //getting confirm message
+        $_SESSION['confirm'] = $confirm;
+        header("Location: index.php");
+        return;
+    }
+
+    $_SESSION['errors'] = $error;
+    header("Location: edit.php?profile_id=" . $profile_id);
+    return;
+
+} else if (isset($_POST['cancel']) && $_POST['cancel'] == "Cancel") {
+    header("Location: index.php");
+    return;
+}
+?>
+<!doctype html>
+<html lang="en" class="h-100">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title><?= $title ?> - Autos Database</title>
+  <link rel="shortcut icon" href="assets/img/icons.jpg" type="image/jpg">
+  <!-- Bootstrap core CSS -->
+  <link href="assets/css/bootstrap.css" rel="stylesheet" type="text/css">
+  <!-- Custom styles for this template -->
+  <link href="assets/css/style.css" rel="stylesheet" type="text/css">
+</head>
+<body class="d-flex flex-column h-100">
+<!-- Begin page content -->
+<main role="main" class="flex-shrink-0">
+  <div class="container">
+    <h1 class="h1">Adding Profile for <?= $_SESSION['user']['name'] ?></h1>
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <p class=" font-weight-bold card-header bg-success text-white">Edit Profile</p>
+          <form action="edit.php?profile_id=<?= $_GET['profile_id'] ?>" accept-charset="UTF-8" method="post"
+
+                spellcheck="false">
+            <div class="card-body">
+                <?= display_error() ?>
+              <div class="form-group row">
+                <label for="first_name" class="col-form-label col-md-3">
+                  First Name
+                  <span class="font-weight-bold text-danger">*</span>
+                </label>
+                <div class="col-md-9">
+                  <input type="text" class="form-control" name="first_name" id="first_name"
+                         size="128" minlength="1" maxlength="30" value="<?= $profile['first_name'] ?>">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="last_name" class="col-form-label col-md-3">
+                  Last Name
+                  <span class="font-weight-bold text-danger">*</span>
+                </label>
+                <div class="col-md-9">
+                  <input type="text" class="form-control" name="last_name" id="last_name"
+                         size="128" minlength="1" maxlength="30" value="<?= $profile['last_name'] ?>">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="email" class="col-form-label col-md-3">
+                  Email
+                  <span class="font-weight-bold text-danger">*</span>
+                </label>
+                <div class="col-md-9">
+                  <input type="text" class="form-control" name="email" id="email"
+                         size="60" minlength="1" maxlength="60" value="<?= $profile['email'] ?>">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="headline" class="col-form-label col-md-3">
+                  Headline
+                  <span class="font-weight-bold text-danger">*</span>
+                </label>
+                <div class="col-md-9">
+                  <input type="text" id="headline" class="form-control" name="headline"
+                         size="11" minlength="1" maxlength="255" value="<?= $profile['headline'] ?>">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="summary" class="col-form-label col-md-3">
+                  Summary
+                  <span class="font-weight-bold text-danger">*</span>
+                </label>
+                <div class="col-md-9">
+                  <textarea id="summary" class="form-control" name="summary"
+                            rows="8" cols="80"><?= $profile['summary'] ?></textarea>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-form-label col-md-3">
+                  Education
+                </label>
+                <div class="col-md-9">
+                  <button type="button" class="btn btn-primary font-weight-bold" onclick="addEduBlock();">+</button>
+                </div>
+              </div>
+              <div id="educations">
+              </div>
+              <div class="form-group row">
+                <label class="col-form-label col-md-3">
+                  Position
+                </label>
+                <div class="col-md-9">
+                  <button type="button" class="btn btn-primary font-weight-bold" onclick="addBlock();">+</button>
+                </div>
+              </div>
+                <?php if (!empty($positions)) : ?>
+                  <div id="positions">
+                      <?php foreach ($positions as $position)  : ?>
+                        <div class="position">
+                          <div class="form-group row">
+                            <label class="col-form-label col-md-3">Year: </label>
+                            <div class="col-md-7">
+                              <input class="form-control" name="year[]" type="text" value="<?= $position['year'] ?>">
+                            </div>
+                            <div class="col-md-2">
+                              <button type="button" class="btn btn-danger" onclick="removeBlock(this);">-</button>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-form-label col-md-3">Description:</label>
+                            <div class="col-md-9">
+                      <textarea class="form-control" name="description[]"
+                                rows="8"><?= $position['description'] ?></textarea>
+                            </div>
+                          </div>
+                        </div>
+                      <?php endforeach; ?>
+                  </div>
+                <?php endif; ?>
+            </div>
+            <div class="card-footer">
+              <div class="row justify-content-between">
+                <input class="btn btn-success" type="submit" name="insert" value="Save">
+                <input class="btn btn-secondary" type="submit" name="cancel" value="Cancel">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer mt-auto py-3">
+  <div class="container">
+    <span class="text-muted">&copy; <?= date('Y') ?> . <?= $title ?></span>
+  </div>
+</footer>
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/bootstrap.bundle.js"></script>
+<script typeof="text/javascript">
+function addEduBlock() {
+        var template = "                <div class=\"position\">\n" +
+            "                  <div class=\"form-group row\">\n" +
+            "                    <label class=\"col-form-label col-md-3\">Year: </label>\n" +
+            "                    <div class=\"col-md-7\">\n" +
+            "                      <input class=\"form-control\" name=\"year[]\" type=\"text\">\n" +
+            "                    </div>\n" +
+            "                    <div class=\"col-md-2\">\n" +
+            "                      <button type=\"button\" class=\"btn btn-danger\" onclick=\"removeBlock(this);\">-</button>\n" +
+            "                    </div>\n" +
+            "                  </div>\n" +
+            "                  <div class=\"form-group row\">\n" +
+            "                    <label class=\"col-form-label col-md-3\">School:</label>\n" +
+            "                    <div class=\"col-md-9\">\n" +
+            "                      <input type=\"text\" class=\"form-control\" name=\"school[]\" rows=\"8\" />\n" +
+            "                    </div>\n" +
+            "                  </div>\n" +
+            "                </div>";
+
+        $("#educations").append(template);
+    }
+    function addBlock() {
+        var template = "                <div class=\"position\">\n" +
+            "                  <div class=\"form-group row\">\n" +
+            "                    <label class=\"col-form-label col-md-3\">Year: </label>\n" +
+            "                    <div class=\"col-md-7\">\n" +
+            "                      <input class=\"form-control\" name=\"year[]\" type=\"text\">\n" +
+            "                    </div>\n" +
+            "                    <div class=\"col-md-2\">\n" +
+            "                      <button type=\"button\" class=\"btn btn-danger\" onclick=\"removeBlock(this);\">-</button>\n" +
+            "                    </div>\n" +
+            "                  </div>\n" +
+            "                  <div class=\"form-group row\">\n" +
+            "                    <label class=\"col-form-label col-md-3\">Description:</label>\n" +
+            "                    <div class=\"col-md-9\">\n" +
+            "                      <textarea class=\"form-control\" name=\"description[]\" rows=\"8\"></textarea>\n" +
+            "                    </div>\n" +
+            "                  </div>\n" +
+            "                </div>";
+
+        $("#positions").append(template);
+    }
+
+    function removeBlock(c) {
+        $(c).parent().parent().parent().remove();
+    };
+</script>
+</body>
 </html>

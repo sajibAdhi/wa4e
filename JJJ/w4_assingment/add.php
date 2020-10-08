@@ -1,121 +1,274 @@
-<?php require_once"Model/addModel.php"; ?>
-<!DOCTYPE html>
-<html lang="en">
+<?php require "include/pdo.php";
 
+//if session don't have name
+if (empty($_SESSION['user']))
+    die("ACCESS DENIED");
+
+if (isset($_POST['insert']) && $_POST['insert'] == "Add") {
+    $error = $confirm = [];
+//Email Validation
+    $first = filter_var(htmlentities($_POST['first_name']), FILTER_SANITIZE_STRING);
+    $last = filter_var(htmlentities($_POST['last_name']), FILTER_SANITIZE_STRING);
+    $email = filter_var(htmlentities($_POST['email']), FILTER_SANITIZE_EMAIL);
+    $headline = filter_var(htmlentities($_POST['headline']), FILTER_SANITIZE_STRING);
+    $summary = filter_var(htmlentities($_POST['summary']), FILTER_SANITIZE_STRING);
+    $user_id = $_SESSION['user']['user_id'];
+
+    $positions = [];
+
+    if (count($_POST['year']) > 0 && count($_POST['description']) > 0) {
+        for ($i = 0; $i < count($_POST['year']); $i++) {
+            if (preg_match("/[\d]+$/", $_POST['year'][$i]) == 0) {
+                array_push($error, "Year must be numeric");
+                break;
+            }
+            array_push($positions, [
+                'year' => $_POST['year'][$i],
+                'rank' => $i,
+                'des' => $_POST['description'][$i],
+            ]);
+        }
+    }
+
+//Make Value validation
+    if ($first == '' || $first == NULL || $last == '' || $last == NULL
+        || $email == '' || $email == NULL || $headline == '' || $email == NULL
+        || $summary == '' || $summary == NULL
+    ) {
+        array_push($error, "All fields are required");
+    } else if (filter_var($email, FILTER_VALIDATE_EMAIL) == false) {
+        array_push($error, "Email address must contain @");
+    }
+
+//no error found && validation passed
+    if (count($error) == 0) {
+        $proof = true;
+        $pdo->beginTransaction();
+
+        $sql = 'INSERT INTO profile(`user_id`, `first_name`, `last_name`, `email`, `headline`, `summary`)
+  VALUES ( :uid, :fn, :ln, :em, :he, :su)';
+
+        $stmt = $pdo->prepare($sql);
+
+        $proof = $stmt->execute([
+            ':uid' => $user_id,
+            ':fn' => htmlentities($_POST['first_name']),
+            ':ln' => htmlentities($_POST['last_name']),
+            ':em' => htmlentities($_POST['email']),
+            ':he' => htmlentities($_POST['headline']),
+            ':su' => htmlentities($_POST['summary']),
+        ]);
+
+        //add postions
+        if (!empty($positions) && $proof == true) {
+
+            $profile_id = $pdo->lastInsertId();
+
+            $sql = 'INSERT INTO `position` (`profile_id`, `rank`, `year`, `description`) ' .
+                'VALUES (:profile, :rank, :year, :des);';
+            $stmt = $pdo->prepare($sql);
+
+            foreach ($positions as $position) {
+                $proof = $stmt->execute([
+                    ':profile' => $profile_id,
+                    ':rank' => $position['rank'],
+                    ':year' => htmlentities($position['year']),
+                    ':des' => htmlentities($position['des']),
+                ]);
+
+                if ($proof == false) break;
+            }
+        }
+
+        //insert failed
+        if (!$proof) {
+            $pdo->rollBack();
+            error_log("Profile added Failed");
+            $confirm = ['type' => 'text-danger', 'msg' => "Profile added Failed"];
+        } //insert succeed
+        else {
+            $pdo->commit();
+            error_log("Profile added");
+            $confirm = ['type' => 'text-success', 'msg' => "Profile added"];
+        }
+
+        //getting confirm message
+        $_SESSION['confirm'] = $confirm;
+        header("Location: index.php");
+        return;
+    }
+
+    $_SESSION['errors'] = $error;
+    header("Location: add.php");
+    return;
+
+} else if (isset($_POST['cancel']) && $_POST['cancel'] == "Cancel") {
+    header("Location: index.php");
+}
+
+?>
+<!doctype html>
+<html lang="en" class="h-100">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sajib Adhikary - CREATE</title>
-
-    <?php require_once "link.php"; ?>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title><?= $title ?> - Autos Database</title>
+  <!-- Bootstrap core CSS -->
+  <link href="assets/css/bootstrap.css" rel="stylesheet" type="text/css">
+  <!-- Custom styles for this template -->
+  <link href="assets/css/style.css" rel="stylesheet" type="text/css">
 </head>
-
-<body>
-    <div class="container">
-        <br>
-        <br>
-        <h1>Add Resume From Sajib</h1>
-        <br>
-        <br>
-        <span><?= empty($msg) ? '' : $msg ?></span>
-        <br>
-        <br>
-        <form method="POST">
-            <!-- First Name -->
-            <div class="form-group row">
-                <label for="first_name" class="col-md-3 col-form-label">First Name:</label>
+<body class="d-flex flex-column h-100">
+<!-- Begin page content -->
+<main role="main" class="flex-shrink-0">
+  <div class="container">
+    <h1 class="h1">Adding Profile for <?= $_SESSION['user']['name'] ?></h1>
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <p class=" font-weight-bold card-header bg-success text-white">Add Profile</p>
+          <form action="add.php" accept-charset="UTF-8" method="post"
+                spellcheck="false">
+            <div class="card-body">
+                <?= display_error() ?>
+              <div class="form-group row">
+                <label for="first_name" class="col-form-label col-md-3">
+                  First Name
+                  <span class="font-weight-bold text-danger">*</span>
+                </label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="first_name" id="first_name">
+                  <input type="text" class="form-control" name="first_name" id="first_name"
+                         size="128" minlength="1" maxlength="30">
                 </div>
-            </div>
-            <!-- Last Name -->
-            <div class="form-group row">
-                <label for="last_name" class="col-md-3 col-form-label">Last Name:</label>
+              </div>
+              <div class="form-group row">
+                <label for="last_name" class="col-form-label col-md-3">
+                  Last Name
+                  <span class="font-weight-bold text-danger">*</span>
+                </label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="last_name" id="last_name">
+                  <input type="text" class="form-control" name="last_name" id="last_name"
+                         size="128" minlength="1" maxlength="30">
                 </div>
-            </div>
-            <!-- email -->
-            <div class="form-group row">
-                <label for="email" class="col-md-3 col-form-label">Email:</label>
+              </div>
+              <div class="form-group row">
+                <label for="email" class="col-form-label col-md-3">
+                  Email
+                  <span class="font-weight-bold text-danger">*</span>
+                </label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="email" id="email">
+                  <input type="text" class="form-control" name="email" id="email"
+                         size="60" minlength="1" maxlength="60">
                 </div>
-            </div>
-            <!-- HEADLINE -->
-            <div class="form-group row">
-                <label for="hline" class="col-md-3 col-form-label">Headline</label>
+              </div>
+              <div class="form-group row">
+                <label for="headline" class="col-form-label col-md-3">
+                  Headline
+                  <span class="font-weight-bold text-danger">*</span>
+                </label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="headline" id="headline">
+                  <input type="text" id="headline" class="form-control" name="headline"
+                         size="11" minlength="1" maxlength="255">
                 </div>
-            </div>
-            <!-- Summary -->
-            <div class="form-group row">
-                <label for="summary" class="col-md-3 col-form-label">Summary</label>
+              </div>
+              <div class="form-group row">
+                <label for="summary" class="col-form-label col-md-3">
+                  Summary
+                  <span class="font-weight-bold text-danger">*</span>
+                </label>
                 <div class="col-md-9">
-                    <textarea class="form-control" name="summary" id="summary" rows="3"></textarea>
+                  <textarea id="summary" class="form-control" name="summary"
+                            rows="8" cols="80"></textarea>
                 </div>
-            </div>
-            <!-- New  Positions -->
-            <div id="positionFields">
-                
-            </div>
-            <!-- position -->
-            <div class="form-group row">
-                <label for="addPos" class="col-md-3 col-form-label">Position</label>
+              </div>
+              <div class="form-group row">
+                <label class="col-form-label col-md-3">
+                  Education
+                </label>
                 <div class="col-md-9">
-                    <button type="button" id="addPos" class="btn btn-warning">+</button>
+                  <button type="button" class="btn btn-primary font-weight-bold" onclick="addEduBlock();">+</button>
                 </div>
-            </div>
-            <!-- Add Button -->
-            <div class="form-group row">
-                <div class="col-md-12">
-                    <button type="submit" class="btn btn-primary">Add</button>
+              </div>
+              <div id="educations">
+              </div>
+              <div class="form-group row">
+                <label class="col-form-label col-md-3">
+                  Position
+                </label>
+                <div class="col-md-9">
+                  <button type="button" class="btn btn-primary font-weight-bold" onclick="addPosBlock();">+</button>
                 </div>
+              </div>
+              <div id="positions">
+              </div>
             </div>
-        </form>
-        <a name="" id="" class="btn btn-secondary" href="index.php" role="button">Cancle</a>
+            <div class="card-footer">
+              <div class="row justify-content-between">
+                <input class="btn btn-success" type="submit" name="insert" value="Add">
+                <input class="btn btn-secondary" type="submit" name="cancel" value="Cancel">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-    <br>
-    <br>
-    <?php require_once "script.php"; ?>
+  </div>
+</main>
 
-    <!-- Custom Script -->
-    <script>
-        countPos = 0;
+<footer class="footer mt-auto py-3">
+  <div class="container">
+    <span class="text-muted">&copy; <?= date('Y') ?> . <?= $title ?></span>
+  </div>
+</footer>
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/bootstrap.bundle.js"></script>
+<script typeof="text/javascript">
+    function addEduBlock() {
+        var template = "                <div class=\"position\">\n" +
+            "                  <div class=\"form-group row\">\n" +
+            "                    <label class=\"col-form-label col-md-3\">Year: </label>\n" +
+            "                    <div class=\"col-md-7\">\n" +
+            "                      <input class=\"form-control\" name=\"year[]\" type=\"text\">\n" +
+            "                    </div>\n" +
+            "                    <div class=\"col-md-2\">\n" +
+            "                      <button type=\"button\" class=\"btn btn-danger\" onclick=\"removeBlock(this);\">-</button>\n" +
+            "                    </div>\n" +
+            "                  </div>\n" +
+            "                  <div class=\"form-group row\">\n" +
+            "                    <label class=\"col-form-label col-md-3\">School:</label>\n" +
+            "                    <div class=\"col-md-9\">\n" +
+            "                      <input type=\"text\" class=\"form-control\" name=\"school[]\" rows=\"8\" />\n" +
+            "                    </div>\n" +
+            "                  </div>\n" +
+            "                </div>";
 
-        $(document).ready(function() {
-            window.console && console.log('Document ready called');
-            $('#addPos').click(function(event) {
+        $("#educations").append(template);
+    }
+    function addPosBlock() {
+        var template = "                <div class=\"position\">\n" +
+            "                  <div class=\"form-group row\">\n" +
+            "                    <label class=\"col-form-label col-md-3\">Year: </label>\n" +
+            "                    <div class=\"col-md-7\">\n" +
+            "                      <input class=\"form-control\" name=\"year[]\" type=\"text\">\n" +
+            "                    </div>\n" +
+            "                    <div class=\"col-md-2\">\n" +
+            "                      <button type=\"button\" class=\"btn btn-danger\" onclick=\"removeBlock(this);\">-</button>\n" +
+            "                    </div>\n" +
+            "                  </div>\n" +
+            "                  <div class=\"form-group row\">\n" +
+            "                    <label class=\"col-form-label col-md-3\">Description:</label>\n" +
+            "                    <div class=\"col-md-9\">\n" +
+            "                      <textarea class=\"form-control\" name=\"description[]\" rows=\"8\"></textarea>\n" +
+            "                    </div>\n" +
+            "                  </div>\n" +
+            "                </div>";
 
-                event.preventDefault();
-                if (countPos >= 9) {
-                    alert("Maximum of nine position entries exceeded");
-                    return;
-                }
-                countPos++;
-                window.console && console.log("Adding position " + countPos);
-                $('#positionFields').append(
-                    '<div id="position' + countPos + '"> \
-                        <div class="form-group row"> \
-                            <label class="col-md-3 col-form-label">Year</label> \
-                            <div class="col-md-6"> \
-                                <input type="text" class="form-control" name="year'+ countPos +'"> \
-                            </div> \
-                            <button type="button" onclick="$(\'#position' + countPos + '\').remove();return false;" \
-                            class="btn btn-warning">-</button> \
-                        </div> \
-                        <div class="form-group row"> \
-                            <label class="col-md-3 col-form-label">Position</label> \
-                            <div class="col-md-9"> \
-                                <input type="text" class="form-control" name="position'+countPos+'"> \
-                            </div> \
-                        </div> \
-                    </div>'
-                );
-            });
-        });
-    </script>
+        $("#positions").append(template);
+    }
+
+    function removeBlock(c) {
+        $(c).parent().parent().parent().remove();
+    };
+</script>
 </body>
-
 </html>

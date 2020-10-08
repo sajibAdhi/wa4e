@@ -1,84 +1,108 @@
-<?php require_once "Model/readModel.php"; ?>
+<?php require "include/pdo.php";
+
+//load autos
+$sql = "SELECT * FROM `profile`;";
+
+$statement = $pdo->query($sql);
+$autos = ($statement->rowCount() > 0)
+    ? $statement->fetchAll(PDO::FETCH_ASSOC)
+    : null;
+?>
 <!doctype html>
-<html lang="en">
-
+<html lang="en" class="h-100">
 <head>
-    <title>Sajib Adhikary - READ</title>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <?php require_once "link.php"; ?>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title><?= $title ?>'s Resume Registry</title>
+  <!-- Bootstrap core CSS -->
+  <link href="assets/css/bootstrap.css" rel="stylesheet" type="text/css">
+  <!-- Custom styles for this template -->
+  <link href="assets/css/style.css" rel="stylesheet" type="text/css">
 </head>
+<body class="d-flex flex-column h-100">
+<!-- Begin page content -->
+<main role="main" class="flex-shrink-0">
+  <div class="container">
+    <h1 class="h1"><?= $title ?>'s Resume Registry</h1>
+      <?php if (empty($_SESSION['user'])) : ?>
+        <a class="font-weight-bold" href="login.php">Please log in</a>
+      <?php else :
+          //show confirmation message
+          if (!empty($_SESSION["confirm"])) {
+              echo '<p class="text-center font-weight-bold ' . $_SESSION["confirm"]['type'] . '">' . $_SESSION["confirm"]['msg'] . '<p>';
+              unset($_SESSION["confirm"]);
+          }
+          ?>
+        <a href="logout.php">Logout</a>
+      <?php endif;
+      //display data
+      if (!empty($autos)) : ?>
+        <div class="row">
+          <div class="mt-4 col-12">
+            <div class="card">
+              <p class="card-header font-weight-bold bg-primary text-white">User Profile List</p>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr class="text-center">
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Heading</th>
+                      <th colspan="2">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($autos as $auto) : ?>
+                      <tr>
+                        <td><?= htmlentities($auto['profile_id'], ENT_COMPAT, ini_get("default_charset"), false) ?></td>
+                        <td><a href="view.php?profile_id=<?= $auto['profile_id'] ?>">
+                                <?= htmlentities($auto['first_name'] . ' ' . $auto['last_name'], ENT_COMPAT, ini_get("default_charset"), false) ?>
+                          </a>
+                        </td>
+                        <td><?= htmlentities($auto['headline'], ENT_COMPAT, ini_get("default_charset"), false) ?></td>
+                        <td class="text-center"><a href="edit.php?profile_id=<?= $auto['profile_id'] ?>"
+                                                   class="btn btn-warning">Edit</a></td>
+                        <td class="text-center"><a href="delete.php?profile_id=<?= $auto['profile_id'] ?>"
+                                                   class="btn btn-danger">Delete</a>
+                        </td>
+                      </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                    <tfoot>
+                    <tr class="text-center">
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Heading</th>
+                      <th colspan="2">Action</th>
+                    </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <?php endif;
+      if (!empty($_SESSION['user'])) : ?>
+        <p class="mt-3">
+          <a href="add.php">Add New Entry</a>
+        </p>
+      <?php endif; ?>
+    <p class="lead mt-3">
+      <b>Note:</b> Your implementation should retain data across multiple
+      logout/login sessions. This sample implementation clears all its data
+      periodically - which you should not do in your implementation.
+    </p>
+  </div>
+</main>
 
-<body>
-    <div class="container">
-        <br>
-        <br>
-        <h1>Sajib Adhikary's Resume Registry</h1>
-        <br>
-        <br>
-        <span><?= empty($msg) ? '' : $msg ?></span>
-        <br>
-        <br>
-        <?php if (!isset($_SESSION['user'])) : ?>
-            <p><a href="login.php">Please log in</a></p>
-        <?php else : ?>
-            <p><a href="logout.php">Logout</a></p>
-            <p>
-                <a name="" id="" class="btn btn-primary" href="add.php" role="button">Add New Entry</a>
-            </p>
-        <?php endif; ?>
-        <br>
-        <br>
-        <?php
-            $datas = allProfileList($pdo);
-        if (!empty($datas)) : ?>
-            <table class="table table-striped table-inverse table-responsive">
-                <thead class="thead-inverse">
-                    <tr>
-                        <th>Name</th>
-                        <th>Headline</th>
-                        <?php if (isset($_SESSION['user'])) : ?>
-                            <th colspan="2">Action</th>
-                        <?php endif; ?>
-                    </tr>
-                </thead>
-                <tfoot class="thead-inverse">
-                    <tr>
-                        <th>Name</th>
-                        <th>Headline</th>
-                        <?php if (isset($_SESSION['user'])) : ?>
-                            <th>Action</th>
-                        <?php endif; ?>
-                    </tr>
-                </tfoot>
-                <tbody>
-                    <?php while ($data = $datas->fetch(PDO::FETCH_ASSOC)) : ?>
-                        <tr>
-                            <td>
-                                <a href="view.php?profile_id=<?= $data['profile_id'] ?>">
-                                    <?= htmlentities($data['first_name']." ".$data['last_name']) ?>
-                                </a>
-                            </td>
-                            <td><?= htmlentities($data['headline'])?></td>
-                            <?php if (isset($_SESSION['user'])) : ?>
-                                <td>
-                                    <a name="" id="" class="btn btn-danger" href="edit.php?profile_id=<?= $data['profile_id']?>" role="button">Edit</a>
-                                </td>
-                                <td>
-                                    <a name="" id="" class="btn btn-warning" href="delete.php?profile_id=<?= $data['profile_id']?>" role="button">Delete</a>
-                                </td>
-                            <?php endif; ?>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
-        <?php endif; ?>
-        <br>
-        <br>
-    </div>
-    <?php require_once "script.php"; ?>
+<footer class="footer mt-auto py-3">
+  <div class="container">
+    <span class="text-muted">&copy; <?= date('Y') ?> . <?= $title ?></span>
+  </div>
+</footer>
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/bootstrap.bundle.js"></script>
 </body>
-
 </html>

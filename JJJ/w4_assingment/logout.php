@@ -1,8 +1,3 @@
-<?php
-session_start();
-
-unset($_SESSION['name']);
-unset($_SESSION['user']);
+<?php require "include/pdo.php";
+session_destroy();
 header("Location: index.php");
-return;
-?>
